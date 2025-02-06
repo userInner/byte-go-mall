@@ -1,0 +1,56 @@
+app: # 项目配置
+  service_name: user-service
+  address: ":8888"
+  log_level: INFO # DEBUG\INFO\WARN\WARNING\ERROR\FATAL
+  trace_state: "enable"
+
+mysql:
+  host: 192.168.8.246
+  port: 3306
+  username: mall_user
+  password: mall123
+  database: go_byte_mall
+  charset: utf8mb4
+  parse_time: true
+  loc: Local
+  log_level: info
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600  # 单位：秒
+  conn_max_idle_time: 600  # 单位：秒
+  slow_threshold: 200      # 慢查询阈值，单位：毫秒
+  trace: true
+  pool: # 连接池配置
+    enable: true
+    max_idle_time: 300  # 空闲连接最大存活时间，单位：秒
+    max_life_time: 3600 # 连接最大存活时间，单位：秒
+    max_idle: 10        # 最大空闲连接数
+    max_open: 100       # 最大打开连接数
+
+etcd:
+  endpoints:
+    - "192.168.8.246:2379"    # etcd 服务器地址
+  username: "root"        # 用户名（如果启用了认证）
+  password: "root123"      # 密码（如果启用了认证）
+  timeout: 5s             # 连接超时时间
+  dial_timeout: 3s        # 拨号超时时间
+  auto_sync_interval: 5s  # 自动同步成员列表间隔
+
+jaeger:
+  enabled: true
+  agent_host: "192.168.8.246"
+  agent_port: "6831"
+  endpoint: "192.168.8.246:4318"
+  username: "jaeger"
+  password: "jaeger"
+  sampler: # 采样配置
+    type: "probabilistic"    # const, probabilistic, ratelimiting, remote
+    param: 0.1              # 采样率 0.1 = 10%
+    host_port: "localhost:5778"
+    max_operations: 1000
+    refresh_interval: 1m
+  reporter: # 上报配置
+    queue_size: 1000
+    buffer_flush_interval: 1s
+    log_spans: true
+    max_backlog: 10000
