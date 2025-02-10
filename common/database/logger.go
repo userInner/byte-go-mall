@@ -21,6 +21,7 @@ func newLogger(dbConfig *config.MySQLConfig) logger.Interface {
 	return &DBLogger{
 		logger:        logging.Logger,
 		slowThreshold: time.Duration(dbConfig.SlowThreshold) * time.Millisecond,
+		config:        dbConfig,
 	}
 }
 
@@ -70,7 +71,7 @@ func (l *DBLogger) Trace(ctx context.Context, begin time.Time, fc func() (string
 		)
 		return
 	}
-
+	fmt.Println(l.config.LogLevel)
 	// 记录正常查询
 	if l.config.LogLevel == "debug" {
 		l.logger.Debug(ctx, "SQL查询",

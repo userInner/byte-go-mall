@@ -3,7 +3,7 @@ app: # 项目配置
   address: ":8888"
   log_level: INFO # DEBUG\INFO\WARN\WARNING\ERROR\FATAL
   trace_state: "enable"
-
+  jwt: "jwtSecret"
 mysql:
   host: 192.168.8.246
   port: 3306

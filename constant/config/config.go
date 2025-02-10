@@ -19,6 +19,7 @@ type ApplicationConfig struct {
 	Address     string `mapstructure:"address"`      // service host
 	Level       string `mapstructure:"log_level"`    // 日志级别
 	TraceState  string `mapstructure:"trace_state"`  // 追踪状态
+	Jwt         string `mapstructure:"jwt"`          // token密钥
 }
 
 // LoadConfig 自动初始化配置
