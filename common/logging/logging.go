@@ -121,8 +121,6 @@ func addTraceFields(ctx context.Context, fields []zap.Field) []zap.Field {
 	span := trace.SpanFromContext(ctx)
 
 	sCtx := span.SpanContext()
-	fmt.Println(sCtx.SpanID())
-	fmt.Println(sCtx.TraceID())
 	if sCtx.HasTraceID() {
 		fields = append(fields, zap.String("trace_id", sCtx.TraceID().String()))
 	}
@@ -140,7 +138,6 @@ func addTraceFields(ctx context.Context, fields []zap.Field) []zap.Field {
 		for _, field := range fields {
 			key := fmt.Sprintf("log.fields.%s", field.Key)
 			var attr attribute.Value
-
 			switch field.Type {
 			// 基础类型处理
 			case zapcore.StringType:
@@ -157,7 +154,7 @@ func addTraceFields(ctx context.Context, fields []zap.Field) []zap.Field {
 				attr = attribute.Int64Value(field.Integer)
 			case zapcore.Float32Type, zapcore.Float64Type:
 				attr = attribute.Float64Value(math.Float64frombits(uint64(field.Integer)))
-			// 默认降级处理
+				// 默认降级处理
 			default:
 				// 尝试反射获取原始值
 				attr = attribute.StringValue(

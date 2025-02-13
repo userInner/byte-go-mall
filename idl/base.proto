@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package base;
+option go_package = "/base";
+
+// 通用响应状态
+message Status {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 状态信息
+}
+
+// 分页请求
+message PageRequest {
+  int32 page_num = 1;    // 页码
+  int32 page_size = 2;   // 每页大小
+}
+
+// 分页响应
+message PageInfo {
+  int32 total = 1;       // 总数
+  int32 page_num = 2;    // 当前页码
+  int32 page_size = 3;   // 每页大小
+}

@@ -1,8 +1,9 @@
 syntax="proto3";
 
 package user;
-
+import "base.proto";
 option go_package="/user";
+
 
 service UserService {
     rpc Register(RegisterReq) returns (RegisterResp) {}
@@ -16,14 +17,16 @@ message RegisterReq {
 }
 
 message RegisterResp {
-    int32 user_id = 1;
+    base.Status status = 1;
+    int32 user_id = 2;
 }
 
 message LoginReq {
-    string email= 1;
+    string email = 1;
     string password = 2;
 }
 
 message LoginResp {
-    int32 user_id = 1;
+    base.Status status = 1;
+    int32 user_id = 2;
 }
