@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package cart;
-
+import "base.proto";
 option go_package = '/cart';
 
 service CartService {
@@ -20,7 +20,9 @@ message AddItemReq {
   CartItem item = 2;
 }
 
-message AddItemResp {}
+message AddItemResp {
+  base.Status status = 1;
+}
 
 message EmptyCartReq {
   uint32 user_id = 1;
@@ -32,6 +34,7 @@ message GetCartReq {
 
 message GetCartResp {
   Cart cart = 1;
+  base.Status status = 2;
 }
 
 message Cart {
@@ -39,4 +42,6 @@ message Cart {
   repeated CartItem items = 2;
 }
 
-message EmptyCartResp {}
+message EmptyCartResp {
+  base.Status status = 1;
+}

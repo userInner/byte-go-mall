@@ -5,7 +5,7 @@ app: # 项目配置
   trace_state: "enable"
   jwt: "jwtSecret"
 mysql:
-  host: 192.168.8.246
+  host: 127.0.0.1
   port: 3306
   username: mall_user
   password: mall123
@@ -29,7 +29,7 @@ mysql:
 
 etcd:
   endpoints:
-    - "192.168.8.246:2379"    # etcd 服务器地址
+    - "127.0.0.1:2379"    # etcd 服务器地址
   username: "root"        # 用户名（如果启用了认证）
   password: "root123"      # 密码（如果启用了认证）
   timeout: 5s             # 连接超时时间
@@ -38,9 +38,9 @@ etcd:
 
 jaeger:
   enabled: true
-  agent_host: "192.168.8.246"
+  agent_host: "127.0.0.1"
   agent_port: "6831"
-  endpoint: "192.168.8.246:4318"
+  endpoint: "127.0.0.1:4318"
   username: "jaeger"
   password: "jaeger"
   sampler: # 采样配置

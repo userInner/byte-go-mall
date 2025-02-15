@@ -41,3 +41,37 @@ CREATE TABLE `tb_user_role` (
                                 UNIQUE KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
 
+CREATE TABLE `tb_product` (
+                              `id` bigint NOT NULL AUTO_INCREMENT COMMENT '商品ID',
+                              `name` varchar(64) NOT NULL COMMENT '商品名称',
+                              `description` text COMMENT '商品描述',
+                              `picture` varchar(255) COMMENT '商品图片',
+                              `price` decimal(10,2) NOT NULL COMMENT '商品价格',
+                              `stock` int NOT NULL DEFAULT '0' COMMENT '库存数量',
+                              `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态(0:下架,1:上架)',
+                              `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                              `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                              PRIMARY KEY (`id`),
+                              KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
+
+CREATE TABLE `tb_shopping_cart` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '购物车ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='购物车表';
+
+CREATE TABLE `tb_cart_item` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '购物车项ID',
+  `cart_id` bigint NOT NULL COMMENT '购物车ID',
+  `product_id` bigint NOT NULL COMMENT '商品ID',
+  `quantity` int NOT NULL DEFAULT '1' COMMENT '商品数量',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_cart_id` (`cart_id`),
+  KEY `idx_product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='购物车项表';

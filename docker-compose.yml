@@ -1,0 +1,120 @@
+
+
+services:
+  # MySQL 服务
+  mysql:
+    image: mysql:5.7.44 
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: go_byte_mall
+      MYSQL_USER: mall_user
+      MYSQL_PASSWORD: mall123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Etcd 服务
+  
+  etcd:
+    image: bitnami/etcd:3.5.18
+    container_name: byte-go-mall-etcd-1
+    environment:
+      ALLOW_NONE_AUTHENTICATION: "yes"  # 使用 key: value 格式
+      ETCDCTL_API: "3"
+      # 通过环境变量配置监听地址（关键修改）
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+      # 必须显式指定客户端广告地址（匹配容器名）
+      ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
+      # 关闭 TLS 相关配置（根据日志需要）
+      ETCD_AUTO_TLS: "false"
+      ETCD_CLIENT_CERT_AUTH: "false"
+    ports:
+      - "2379:2379"
+
+
+  # Jaeger 服务
+  jaeger:
+    image: jaegertracing/all-in-one:1.50
+    ports:
+      - "6831:6831/udp"  # Jaeger agent UDP 端口
+      - "6832:6832/udp"
+      - "5778:5778"     # Jaeger sampling 端口
+      - "16686:16686"   # Jaeger UI 端口
+      - "4318:4318"     # Jaeger OTLP 接收端口
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  # 你的 Go 项目
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      - APP_SERVICE_NAME=user-service
+      - APP_ADDRESS=:8888
+      - APP_LOG_LEVEL=INFO
+      - APP_TRACE_STATE=enable
+      - APP_JWT=jwtSecret
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USERNAME=mall_user
+      - MYSQL_PASSWORD=mall123
+      - MYSQL_DATABASE=go_byte_mall
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_PARSE_TIME=true
+      - MYSQL_LOC=Local
+      - MYSQL_LOG_LEVEL=info
+      - MYSQL_MAX_IDLE_CONNS=10
+      - MYSQL_MAX_OPEN_CONNS=100
+      - MYSQL_CONN_MAX_LIFETIME=3600
+      - MYSQL_CONN_MAX_IDLE_TIME=600
+      - MYSQL_SLOW_THRESHOLD=200
+      - MYSQL_TRACE=true
+      - MYSQL_POOL_ENABLE=true
+      - MYSQL_POOL_MAX_IDLE_TIME=300
+      - MYSQL_POOL_MAX_LIFE_TIME=3600
+      - MYSQL_POOL_MAX_IDLE=10
+      - MYSQL_POOL_MAX_OPEN=100
+      - ETCD_ENDPOINTS=etcd:2379
+      - ETCD_USERNAME=root
+      - ETCD_PASSWORD=root123
+      - ETCD_TIMEOUT=5s
+      - ETCD_DIAL_TIMEOUT=3s
+      - ETCD_AUTO_SYNC_INTERVAL=5s
+      - JAEGER_ENABLED=true
+      - JAEGER_AGENT_HOST=jaeger
+      - JAEGER_AGENT_PORT=6831
+      - JAEGER_ENDPOINT=jaeger:4318
+      - JAEGER_USERNAME=jaeger
+      - JAEGER_PASSWORD=jaeger
+      - JAEGER_SAMPLER_TYPE=probabilistic
+      - JAEGER_SAMPLER_PARAM=0.1
+      - JAEGER_SAMPLER_HOST_PORT=jaeger:5778
+      - JAEGER_SAMPLER_MAX_OPERATIONS=1000
+      - JAEGER_SAMPLER_REFRESH_INTERVAL=1m
+      - JAEGER_REPORTER_QUEUE_SIZE=1000
+      - JAEGER_REPORTER_BUFFER_FLUSH_INTERVAL=1s
+      - JAEGER_REPORTER_LOG_SPANS=true
+      - JAEGER_REPORTER_MAX_BACKLOG=10000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      etcd:
+        condition: service_started
+      jaeger:
+        condition: service_started
+    volumes:
+      - ./deploy/config/config.yaml:/app/user/config.yaml  # 挂载配置文件
+    command: ["./user-service", "/app/user/config.yaml"]   # 添加命令行参数
+
+volumes:
+  mysql_data:
+   

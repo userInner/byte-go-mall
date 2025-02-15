@@ -12,6 +12,7 @@ import (
 	"byte-go-mall/utils"
 	"context"
 	"errors"
+
 	"go.uber.org/zap"
 )
 
@@ -34,9 +35,11 @@ func (s *RegisterService) Run(req *user.RegisterReq) (resp *user.RegisterResp, e
 	logging.SetSpanWithHostname(span)
 	log := logging.LogService(config.AppConfig.App.ServiceName)
 	resp = &user.RegisterResp{}
+
 	// 参数验证
 	if err = s.validateRegister(req); err != nil {
 		resp.Status = errno.WithMessage(&base.Status{Code: 10003}, err.Error())
+
 		return resp, err
 	}
 	// 判断密码是否严格

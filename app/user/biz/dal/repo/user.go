@@ -3,6 +3,7 @@ package repo
 import (
 	"byte-go-mall/model"
 	"context"
+
 	"gorm.io/gorm"
 )
 
@@ -61,5 +62,12 @@ func (r *UserRepository) ExistsByUsername(ctx context.Context, username string) 
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.User{}).
 		Where("username = ?", username).Count(&count).Error
+	return count > 0, err
+}
+
+func (r *UserRepository) ExistsByID(ctx context.Context, id int64) (bool, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&model.User{}).
+		Where("id = ?", id).Count(&count).Error
 	return count > 0, err
 }
