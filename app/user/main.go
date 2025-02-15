@@ -54,22 +54,21 @@ func main() {
 
 	// 4. 初始化Kitex配置
 	fmt.Println("正在初始化Kitex配置...")
-	userOpts, err := kitexInit(config.AppConfig.App.Address)
+	userOpts, err := kitexInit(config.AppConfig.App.UserAddress) // 使用 User 服务端口
 	if err != nil {
-		fmt.Printf("Kitex初始化失败，错误详情: %v\n", err)
-		klog.Fatalf("Kitex初始化失败: %v", err)
+		fmt.Printf("User服务Kitex初始化失败，错误详情: %v\n", err)
+		klog.Fatalf("User服务Kitex初始化失败: %v", err)
 		return
 	}
-	fmt.Println("Kitex配置初始化成功")
+	fmt.Println("User服务Kitex配置初始化成功")
 
-	// 假设Cart服务使用另一个端口，例如 :8889
-	cartAddress := ":8889"
-	cartOpts, err := kitexInit(cartAddress)
+	cartOpts, err := kitexInit(config.AppConfig.App.CartAddress) // 使用 Cart 服务端口
 	if err != nil {
 		fmt.Printf("Cart服务Kitex初始化失败，错误详情: %v\n", err)
 		klog.Fatalf("Cart服务Kitex初始化失败: %v", err)
 		return
 	}
+	fmt.Println("Cart服务Kitex配置初始化成功")
 
 	// 5. 初始化数据库
 	fmt.Println("正在初始化数据库连接...")
@@ -91,15 +90,15 @@ func main() {
 	cartSvr := cartservice.NewServer(cartImpl, cartOpts...)
 
 	go func() {
-		fmt.Printf("正在启动User服务器，地址: %s...\n", config.AppConfig.App.Address)
+		fmt.Printf("正在启动User服务器，地址: %s...\n", config.AppConfig.App.UserAddress)
 		if err := userSvr.Run(); err != nil {
-			klog.Fatalf("user服务运行失败: %v", err)
+			klog.Fatalf("User服务运行失败: %v", err)
 		}
 	}()
 
-	fmt.Printf("正在启动Cart服务器，地址: %s...\n", cartAddress)
+	fmt.Printf("正在启动Cart服务器，地址: %s...\n", config.AppConfig.App.CartAddress)
 	if err := cartSvr.Run(); err != nil {
-		klog.Fatalf("cart服务运行失败: %v", err)
+		klog.Fatalf("Cart服务运行失败: %v", err)
 	}
 }
 

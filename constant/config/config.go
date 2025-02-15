@@ -15,11 +15,12 @@ type Config struct {
 
 // ApplicationConfig 程序配置
 type ApplicationConfig struct {
-	ServiceName string `mapstructure:"service_name"` // service name
-	Address     string `mapstructure:"address"`      // service host
+	ServiceName string `mapstructure:"service_name"` // 服务名称
+	UserAddress string `mapstructure:"user_address"` // User 服务监听地址
+	CartAddress string `mapstructure:"cart_address"` // Cart 服务监听地址
 	Level       string `mapstructure:"log_level"`    // 日志级别
 	TraceState  string `mapstructure:"trace_state"`  // 追踪状态
-	Jwt         string `mapstructure:"jwt"`          // token密钥
+	Jwt         string `mapstructure:"jwt"`          // token 密钥
 }
 
 // LoadConfig 自动初始化配置
