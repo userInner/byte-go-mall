@@ -55,6 +55,7 @@ func (s *GetCart) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err error) 
 				UserId: req.UserId,
 				Items:  []*cart.CartItem{},
 			}
+			resp.Status = errno.UserCartNotFound
 			log.WithFields(
 				zap.Int64("user_id", int64(req.UserId)),
 			).Info(ctx, "cart is empty")
@@ -88,7 +89,7 @@ func (s *GetCart) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err error) 
 			Quantity:  int32(item.Quantity),
 		})
 	}
-
+	resp.Status = errno.Success
 	log.WithFields(
 		zap.Int64("user_id", int64(req.UserId)),
 		zap.Int64("cart_id", int64(shoppingCart.ID)),

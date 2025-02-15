@@ -1,2 +1,4 @@
 /log
 *.log
+/build.sh
+*build.sh
