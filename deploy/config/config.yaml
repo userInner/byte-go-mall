@@ -2,6 +2,7 @@ app: # 项目配置
   service_name: user-service
   user_address: ":8888"
   cart_address: ":8889"
+  order_address: ":8887"
   log_level: INFO # DEBUG\INFO\WARN\WARNING\ERROR\FATAL
   trace_state: "enable"
   jwt: "jwtSecret"

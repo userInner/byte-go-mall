@@ -3,6 +3,7 @@ syntax = "proto3";
 package order;
 
 import "cart.proto";
+import "base.proto";
 
 option go_package = "order";
 
@@ -40,6 +41,7 @@ message OrderResult {
 
 message PlaceOrderResp {
   OrderResult order = 1;
+  base.Status status = 2;
 }
 
 message ListOrderReq {
@@ -58,6 +60,7 @@ message Order {
 
 message ListOrderResp {
   repeated Order orders = 1;
+  base.Status status = 2;
 }
 
 message MarkOrderPaidReq {
@@ -65,4 +68,6 @@ message MarkOrderPaidReq {
   string order_id = 2;
 }
 
-message MarkOrderPaidResp {}
+message MarkOrderPaidResp {
+  base.Status status = 1;
+}
