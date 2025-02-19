@@ -13,6 +13,7 @@ var (
 	PasswordError    = &base.Status{Code: 20003, Message: "Password error"}
 	WeakPassword     = &base.Status{Code: 20004, Message: "Password is too weak"} // 用户密码太简单
 	UserCartNotFound = &base.Status{Code: 20005, Message: "User Shopping Cart Not Found"}
+	OrderNotFound    = &base.Status{Code: 20006, Message: "Order Not Found"}
 )
 
 type StatusError struct {
