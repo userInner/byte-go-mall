@@ -7,11 +7,13 @@ import (
 	"byte-go-mall/common/tracing"
 	"byte-go-mall/constant/config"
 	"byte-go-mall/kitex_gen/cart/cartservice"
+	"byte-go-mall/kitex_gen/order/orderservice"
 	"byte-go-mall/kitex_gen/user/userservice"
 	"context"
 	"fmt"
 	"net"
 	"os"
+	"sync"
 
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -54,21 +56,26 @@ func main() {
 
 	// 4. 初始化Kitex配置
 	fmt.Println("正在初始化Kitex配置...")
-	userOpts, err := kitexInit(config.AppConfig.App.UserAddress) // 使用 User 服务端口
+	userOpts, err := kitexInit(config.AppConfig.App.UserAddress)
 	if err != nil {
-		fmt.Printf("User服务Kitex初始化失败，错误详情: %v\n", err)
 		klog.Fatalf("User服务Kitex初始化失败: %v", err)
 		return
 	}
 	fmt.Println("User服务Kitex配置初始化成功")
 
-	cartOpts, err := kitexInit(config.AppConfig.App.CartAddress) // 使用 Cart 服务端口
+	cartOpts, err := kitexInit(config.AppConfig.App.CartAddress)
 	if err != nil {
-		fmt.Printf("Cart服务Kitex初始化失败，错误详情: %v\n", err)
 		klog.Fatalf("Cart服务Kitex初始化失败: %v", err)
 		return
 	}
 	fmt.Println("Cart服务Kitex配置初始化成功")
+
+	orderOpts, err := kitexInit(config.AppConfig.App.OrderAddress)
+	if err != nil {
+		klog.Fatalf("Order服务Kitex初始化失败: %v", err)
+		return
+	}
+	fmt.Println("Order服务Kitex配置初始化成功")
 
 	// 5. 初始化数据库
 	fmt.Println("正在初始化数据库连接...")
@@ -84,22 +91,47 @@ func main() {
 	userImpl.repo = repo.NewRepository(db)
 	cartImpl := new(CartServiceImpl)
 	cartImpl.repo = repo.NewRepository(db)
+	orderImpl := new(OrderServiceImpl)
+	orderImpl.repo = repo.NewRepository(db)
 
 	// 7. 创建并启动服务器
 	userSvr := userservice.NewServer(userImpl, userOpts...)
 	cartSvr := cartservice.NewServer(cartImpl, cartOpts...)
+	orderSvr := orderservice.NewServer(orderImpl, orderOpts...)
 
+	// 使用WaitGroup等待所有服务
+	var wg sync.WaitGroup
+	wg.Add(3)
+
+	// 启动User服务
 	go func() {
+		defer wg.Done()
 		fmt.Printf("正在启动User服务器，地址: %s...\n", config.AppConfig.App.UserAddress)
 		if err := userSvr.Run(); err != nil {
-			klog.Fatalf("User服务运行失败: %v", err)
+			klog.Errorf("User服务运行失败: %v", err)
 		}
 	}()
 
-	fmt.Printf("正在启动Cart服务器，地址: %s...\n", config.AppConfig.App.CartAddress)
-	if err := cartSvr.Run(); err != nil {
-		klog.Fatalf("Cart服务运行失败: %v", err)
-	}
+	// 启动Cart服务
+	go func() {
+		defer wg.Done()
+		fmt.Printf("正在启动Cart服务器，地址: %s...\n", config.AppConfig.App.CartAddress)
+		if err := cartSvr.Run(); err != nil {
+			klog.Errorf("Cart服务运行失败: %v", err)
+		}
+	}()
+
+	// 启动Order服务
+	go func() {
+		defer wg.Done()
+		fmt.Printf("正在启动Order服务器，地址: %s...\n", config.AppConfig.App.OrderAddress)
+		if err := orderSvr.Run(); err != nil {
+			klog.Errorf("Order服务运行失败: %v", err)
+		}
+	}()
+
+	// 等待所有服务完成
+	wg.Wait()
 }
 
 // kitexInit 初始化Kitex配置
