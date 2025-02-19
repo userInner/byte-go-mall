@@ -25,6 +25,11 @@ func (x *CartItem) FastRead(buf []byte, _type int8, number int32) (offset int, e
 		if err != nil {
 			goto ReadFieldError
 		}
+	case 3:
+		offset, err = x.fastReadField3(buf, _type)
+		if err != nil {
+			goto ReadFieldError
+		}
 	default:
 		offset, err = fastpb.Skip(buf, _type, number)
 		if err != nil {
@@ -45,6 +50,11 @@ func (x *CartItem) fastReadField1(buf []byte, _type int8) (offset int, err error
 
 func (x *CartItem) fastReadField2(buf []byte, _type int8) (offset int, err error) {
 	x.Quantity, offset, err = fastpb.ReadInt32(buf, _type)
+	return offset, err
+}
+
+func (x *CartItem) fastReadField3(buf []byte, _type int8) (offset int, err error) {
+	x.ProductName, offset, err = fastpb.ReadString(buf, _type)
 	return offset, err
 }
 
@@ -289,6 +299,7 @@ func (x *CartItem) FastWrite(buf []byte) (offset int) {
 	}
 	offset += x.fastWriteField1(buf[offset:])
 	offset += x.fastWriteField2(buf[offset:])
+	offset += x.fastWriteField3(buf[offset:])
 	return offset
 }
 
@@ -305,6 +316,14 @@ func (x *CartItem) fastWriteField2(buf []byte) (offset int) {
 		return offset
 	}
 	offset += fastpb.WriteInt32(buf[offset:], 2, x.GetQuantity())
+	return offset
+}
+
+func (x *CartItem) fastWriteField3(buf []byte) (offset int) {
+	if x.ProductName == "" {
+		return offset
+	}
+	offset += fastpb.WriteString(buf[offset:], 3, x.GetProductName())
 	return offset
 }
 
@@ -455,6 +474,7 @@ func (x *CartItem) Size() (n int) {
 	}
 	n += x.sizeField1()
 	n += x.sizeField2()
+	n += x.sizeField3()
 	return n
 }
 
@@ -471,6 +491,14 @@ func (x *CartItem) sizeField2() (n int) {
 		return n
 	}
 	n += fastpb.SizeInt32(2, x.GetQuantity())
+	return n
+}
+
+func (x *CartItem) sizeField3() (n int) {
+	if x.ProductName == "" {
+		return n
+	}
+	n += fastpb.SizeString(3, x.GetProductName())
 	return n
 }
 
@@ -618,6 +646,7 @@ func (x *EmptyCartResp) sizeField1() (n int) {
 var fieldIDToName_CartItem = map[int32]string{
 	1: "ProductId",
 	2: "Quantity",
+	3: "ProductName",
 }
 
 var fieldIDToName_AddItemReq = map[int32]string{
